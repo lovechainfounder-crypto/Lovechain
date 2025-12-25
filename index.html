@@ -1,60 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LOVECHAIN — Love, but forever.</title>
-<meta name="description" content="Store human love on-chain. Every memory. Every sacrifice. Recorded for eternity.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOVECHAIN — Love, but forever.</title>
+  <meta name="description" content="LOVECHAIN — Store love on-chain. Every memory. Every sacrifice. Recorded for eternity." />
 
-<style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff1f6;color:#3b2f3a;text-align:center}
-.hero{padding:70px 20px}
-.hero img{max-width:220px;border-radius:50%;box-shadow:0 0 40px rgba(255,77,148,.5);margin-bottom:20px}
-.hero h1{font-size:44px;margin:0;color:#ff4d94}
-.hero p{max-width:520px;margin:20px auto;font-size:16px;color:#6b4c5c}
-.btn{display:inline-block;margin:12px;padding:14px 24px;border-radius:30px;background:#ff4d94;color:#fff;text-decoration:none;font-weight:bold}
-.section{padding:50px 20px}
-.card{max-width:700px;margin:0 auto;background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 40px rgba(0,0,0,.08)}
-.gallery{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:25px}
-.gallery img{width:180px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
-.wallet{word-break:break-all;font-size:13px;background:#fff0f6;padding:14px;border-radius:14px;margin-top:10px}
-footer{padding:30px;font-size:13px;color:#8b6c7b}
-</style>
+  <style>
+    :root{
+      --bg:#fff2f7;
+      --card:#ffffffcc;
+      --ink:#2f2431;
+      --muted:#6f5667;
+      --pink:#ff4d9a;
+      --pink2:#ff7bbf;
+      --purple:#b074ff;
+      --stroke:#ffd2e4;
+      --shadow: 0 18px 60px rgba(30,10,25,.12);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, #ffe2ef 0%, transparent 60%),
+        radial-gradient(900px 600px at 110% 30%, #eadbff 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg), #ffffff);
+      overflow-x:hidden;
+    }
+
+    /* Floating love bubbles */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      overflow:hidden;
+    }
+    .heart{
+      position:absolute;
+      bottom:-120px;
+      width:18px;height:18px;
+      opacity:.7;
+      filter: blur(.0px);
+      animation: floatUp linear infinite;
+    }
+    .heart::before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(255,255,255,.0) 60%),
+                  linear-gradient(135deg, rgba(255,77,154,.75), rgba(176,116,255,.55));
+      border-radius: 6px 6px 10px 10px;
+      transform: rotate(45deg);
+      clip-path: polygon(50% 15%, 62% 5%, 78% 12%, 88% 28%, 88% 45%, 78% 60%, 50% 90%, 22% 60%, 12% 45%, 12% 28%, 22% 12%, 38% 5%);
+      box-shadow: 0 10px 25px rgba(255,77,154,.25);
+    }
+    @keyframes floatUp{
+      0%{ transform: translateY(0) translateX(0) scale(.9); opacity:0 }
+      10%{opacity:.65}
+      100%{ transform: translateY(-120vh) translateX(var(--drift)) scale(var(--scale)); opacity:0 }
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:18px 18px 42px; position:relative; z-index:1;}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 4px;
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(255,242,247,.9), rgba(255,242,247,.55));
+      border-bottom:1px solid rgba(255,210,228,.7);
+    }
+    .brand{display:flex;gap:10px;align-items:center;font-weight:900;letter-spacing:.4px}
+    .logo{
+      width:42px;height:42px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(255,77,154,.9), rgba(176,116,255,.75));
+      box-shadow: 0 16px 40px rgba(255,77,154,.28);
+      display:grid;place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle, rgba(255,255,255,.55), transparent 55%);
+      transform: rotate(25deg);
+      animation: shine 3.6s ease-in-out infinite;
+    }
+    @keyframes shine{
+      0%,100%{transform: translateX(-10%) rotate(25deg); opacity:.35}
+      50%{transform: translateX(20%) rotate(25deg); opacity:.7}
+    }
+    .brand small{display:block;color:var(--muted);font-weight:800;letter-spacing:.1px;margin-top:2px}
+
+    .navlinks{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      border:1px solid rgba(255,210,228,.9);
+      background: rgba(255,255,255,.65);
+      padding:9px 12px;border-radius:999px;
+      font-weight:800;
+      box-shadow: 0 10px 26px rgba(30,10,25,.08);
+      transition:.18s transform ease,.18s box-shadow ease,.18s background ease;
+      text-decoration:none;color:var(--ink);
+    }
+    .pill:hover{transform:translateY(-1px); background:rgba(255,255,255,.9); box-shadow: 0 14px 32px rgba(30,10,25,.12);}
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+      padding:26px 0 12px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){ .hero{grid-template-columns:1fr;} }
+
+    .card{
+      border:1px solid rgba(255,210,228,.9);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px;
+    }
+
+    .headline{
+      margin:10px 0 8px;
+      font-size: clamp(34px, 4.4vw, 56px);
+      line-height:1.02;
+      letter-spacing:-.9px;
+    }
+    .glowtext{
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      -webkit-background-clip:text; background-clip:text;
+      color:transparent;
+      text-shadow: 0 10px 30px rgba(255,77,154,.15);
+    }
+    .sub{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:16px;
+      max-width: 62ch;
+    }
+
+    .heroImg{
+      width:140px;height:140px;border-radius:50%;
+      object-fit:cover;
+      border:1px solid rgba(255,210,228,.9);
+      box-shadow: 0 22px 55px rgba(255,77,154,.22);
+      display:block;
+      margin:6px 0 10px;
+    }
+
+    .ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,77,154,.28);
+      background: rgba(255,255,255,.72);
+      font-weight:900;
+      text-decoration:none;
+      color:var(--ink);
+      box-shadow: 0 14px 34px rgba(30,10,25,.10);
+      transition:.18s transform ease,.18s box-shadow ease,.18s background ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.92); box-shadow: 0 18px 40px rgba(30,10,25,.14);}
+    .btn.glow{
+      background: linear-gradient(135deg, rgba(255,77,154,.22), rgba(176,116,255,.18));
+    }
+    .btn.glow:before{
+      content:"";
+      position:absolute; inset:-60%;
+      background: radial-gradient(circle, rgba(255,255,255,.65), transparent 55%);
+      animation: btnShine 2.9s ease-in-out infinite;
+      transform: rotate(15deg);
+      opacity:.55;
+    }
+    @keyframes btnShine{
+      0%,100%{transform: translateX(-15%) rotate(15deg); opacity:.25}
+      50%{transform: translateX(18%) rotate(15deg); opacity:.55}
+    }
+    .btn span{position:relative; z-index:1;}
+
+    .smallNote{margin-top:10px;color:var(--muted);font-size:13px;line-height:1.55}
+
+    .burnBox{
+      padding:14px;
+      border-radius:18px;
+      border:1px dashed rgba(255,77,154,.35);
+      background: rgba(255,255,255,.75);
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color:#3a2b3a;
+      line-height:1.55;
+    }
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .copy{
+      border:none;
+      background: linear-gradient(135deg, rgba(255,77,154,.85), rgba(176,116,255,.75));
+      color:#fff;
+      font-weight:900;
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      box-shadow: 0 16px 40px rgba(255,77,154,.25);
+      transition:.18s transform ease,.18s box-shadow ease;
+    }
+    .copy:hover{transform: translateY(-1px); box-shadow: 0 20px 46px rgba(255,77,154,.32);}
+    .copy:active{transform: translateY(1px);}
+
+    .section{padding:12px 0 0}
+    .section h2{margin:0 0 8px; font-size:22px; letter-spacing:-.3px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr;} }
+
+    .tile{
+      border:1px solid rgba(255,210,228,.9);
+      background: rgba(255,255,255,.72);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow: 0 14px 40px rgba(30,10,25,.08);
+    }
+    .tile img{
+      width:100%;
+      height:190px;
+      object-fit:cover;
+      display:block;
+    }
+    .tile .pad{padding:12px 12px 14px}
+    .tile b{display:block;margin-bottom:6px}
+    .tile p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.55}
+
+    .divider{height:1px;background:rgba(255,210,228,.85);margin:14px 0;border-radius:999px}
+
+    .footer{
+      padding:22px 0 10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      text-align:center;
+    }
+
+    .toast{
+      position: fixed;
+      left:50%; bottom:18px;
+      transform: translateX(-50%);
+      background: rgba(30,20,34,.92);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      box-shadow: 0 16px 40px rgba(0,0,0,.25);
+      z-index:10;
+    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px);}
+  </style>
 </head>
 
 <body>
+  <!-- Floating love bubbles -->
+  <div class="hearts" aria-hidden="true">
+    <!-- 14 hearts with different speeds/drifts -->
+    <div class="heart" style="left:6%;  animation-duration:12s; --drift:-18px; --scale:1.10; animation-delay:-2s;"></div>
+    <div class="heart" style="left:14%; animation-duration:16s; --drift:22px;  --scale:0.95; animation-delay:-9s;"></div>
+    <div class="heart" style="left:22%; animation-duration:14s; --drift:-10px; --scale:1.25; animation-delay:-6s;"></div>
+    <div class="heart" style="left:31%; animation-duration:18s; --drift:28px;  --scale:0.85; animation-delay:-11s;"></div>
+    <div class="heart" style="left:38%; animation-duration:13s; --drift:-26px; --scale:1.05; animation-delay:-4s;"></div>
+    <div class="heart" style="left:46%; animation-duration:20s; --drift:16px;  --scale:0.80; animation-delay:-15s;"></div>
+    <div class="heart" style="left:54%; animation-duration:15s; --drift:-14px; --scale:1.15; animation-delay:-7s;"></div>
+    <div class="heart" style="left:62%; animation-duration:19s; --drift:30px;  --scale:0.90; animation-delay:-13s;"></div>
+    <div class="heart" style="left:70%; animation-duration:12.5s;--drift:-20px; --scale:1.30; animation-delay:-3s;"></div>
+    <div class="heart" style="left:78%; animation-duration:17s; --drift:24px;  --scale:0.88; animation-delay:-10s;"></div>
+    <div class="heart" style="left:85%; animation-duration:14.5s;--drift:-12px; --scale:1.08; animation-delay:-8s;"></div>
+    <div class="heart" style="left:90%; animation-duration:21s; --drift:12px;  --scale:0.78; animation-delay:-16s;"></div>
+    <div class="heart" style="left:95%; animation-duration:13.5s;--drift:-22px; --scale:1.18; animation-delay:-5s;"></div>
+    <div class="heart" style="left:50%; animation-duration:22s; --drift:8px;   --scale:0.75; animation-delay:-18s;"></div>
+  </div>
 
-<div class="hero">
-<img src="love1.png">
-<h1>LOVECHAIN</h1>
-<p>Love doesn’t disappear. It is stored on-chain forever.</p>
-<a href="https://t.me/lovechainportal" class="btn">Telegram</a>
-<a href="https://x.com/LoveChainWorld" class="btn">X (Twitter)</a>
-</div>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          LOVECHAIN
+          <small>Love, but forever.</small>
+        </div>
+      </div>
 
-<div class="section">
-<div class="card">
-<h2>The World of Love</h2>
-<p>A sanctuary to preserve human love and sacrifice on-chain.</p>
+      <nav class="navlinks" aria-label="Links">
+        <a class="pill" href="https://t.me/lovechainportal" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a class="pill" href="https://x.com/LoveChainWorld" target="_blank" rel="noopener noreferrer">X</a>
+        <a class="pill" href="#burn">Burn</a>
+      </nav>
+    </header>
 
-<div class="gallery">
-<img src="love1.png">
-<img src="love2.png">
-<img src="love3.png">
-</div>
+    <section class="hero">
+      <!-- Left: story -->
+      <div class="card">
+        <img class="heroImg" src="love1.png" alt="LoveChain Mascot" />
 
-<h2>Burn as Sacrifice</h2>
-<p>True love has a cost. Every sacrifice is recorded forever.</p>
-<div class="wallet">
-🔥 Burn Wallet:<br>
-CtGKzKwjvE1Z8SxaLAeGkE1Q58PqkszjoExsUko3VAYu
-</div>
-</div>
-</div>
+        <h1 class="headline">
+          Keep <span class="glowtext">love alive</span><br/>
+          on-chain.
+        </h1>
 
-<footer>
-LOVECHAIN — Love, but forever.
-</footer>
+        <p class="sub">
+          LOVECHAIN is a sanctuary where love becomes a legacy.
+          Every memory is honored. Every sacrifice is witnessed.
+          Not for a moment — for eternity.
+        </p>
 
+        <div class="ctaRow">
+          <a class="btn glow" href="https://t.me/lovechainportal" target="_blank" rel="noopener noreferrer">
+            <span>💬 Join Telegram</span>
+          </a>
+          <a class="btn glow" href="https://x.com/LoveChainWorld" target="_blank" rel="noopener noreferrer">
+            <span>𝕏 Follow on X</span>
+          </a>
+          <button class="btn glow" id="copyBurnTop" type="button">
+            <span>🔥 Copy Burn Wallet</span>
+          </button>
+        </div>
+
+        <p class="smallNote">
+          Mint your love • Burn as sacrifice • Leave your legacy.
+        </p>
+      </div>
+
+      <!-- Right: burn box -->
+      <aside class="card" id="burn">
+        <h2 style="margin:0 0 8px;">🔥 Burn as Sacrifice</h2>
+        <p class="sub" style="margin-bottom:12px;">
+          Real love costs something. A burn is your symbol:
+          irreversible, visible, and forever remembered.
+        </p>
+
+        <div class="burnBox">
+          <div class="row">
+            <b>Official Burn Wallet</b>
+            <button class="copy" id="copyBurn" type="button">Copy</button>
+          </div>
+          <div class="divider"></div>
+          <div class="mono" id="burnAddr">CtGKzKwjvE1Z8SxaLAeGkE1Q58PqkszjoExsUko3VAYu</div>
+          <div class="divider"></div>
+          <p class="smallNote" style="margin:0;">
+            Always double-check the address. Never trust random DMs.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <h2 style="margin:0 0 8px;">💗 The Rituals</h2>
+        <p class="sub" style="margin-bottom:0;">
+          Vow Burn (wedding) • Forgiveness Burn • Memory Burn (anniversary)
+        </p>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h2>The World of Love</h2>
+        <p class="sub" style="max-width:none;">
+          Three moments — one promise: love doesn’t vanish. It becomes a story you can prove.
+        </p>
+
+        <div class="grid">
+          <div class="tile">
+            <img src="love1.png" alt="LoveChain Memory" />
+            <div class="pad">
+              <b>Memory</b>
+              <p>Turn moments into a timeless trace — soft, warm, unforgettable.</p>
+            </div>
+          </div>
+
+          <div class="tile">
+            <img src="love2.png" alt="LoveChain Mint" />
+            <div class="pad">
+              <b>Mint Your Love</b>
+              <p>Declare a bond. A gentle mark that says: “I chose you.”</p>
+            </div>
+          </div>
+
+          <div class="tile">
+            <img src="love3.png" alt="LoveChain Sacrifice" />
+            <div class="pad">
+              <b>Sacrifice</b>
+              <p>Burn as proof — because true love always has a cost.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="ctaRow" style="justify-content:center;">
+          <a class="btn glow" href="https://t.me/lovechainportal" target="_blank" rel="noopener noreferrer">
+            <span>Enter the Portal</span>
+          </a>
+          <a class="btn glow" href="https://x.com/LoveChainWorld" target="_blank" rel="noopener noreferrer">
+            <span>See Updates on X</span>
+          </a>
+          <button class="btn glow" id="copyBurnBottom" type="button">
+            <span>Copy Burn Wallet</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      LOVECHAIN — Love, but forever.<br/>
+      <span style="opacity:.85;">Not financial advice. Crypto is risky. Do your own research.</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    (function(){
+      const burn = "CtGKzKwjvE1Z8SxaLAeGkE1Q58PqkszjoExsUko3VAYu";
+      const toast = document.getElementById("toast");
+
+      function showToast(text){
+        toast.textContent = text || "Copied!";
+        toast.classList.add("show");
+        setTimeout(()=>toast.classList.remove("show"), 1200);
+      }
+
+      async function copyText(text){
+        try{
+          await navigator.clipboard.writeText(text);
+          showToast("Burn wallet copied");
+        }catch(e){
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+          showToast("Burn wallet copied");
+        }
+      }
+
+      document.getElementById("copyBurn").addEventListener("click", ()=>copyText(burn));
+      document.getElementById("copyBurnTop").addEventListener("click", ()=>copyText(burn));
+      document.getElementById("copyBurnBottom").addEventListener("click", ()=>copyText(burn));
+      document.getElementById("burnAddr").addEventListener("click", ()=>copyText(burn));
+    })();
+  </script>
 </body>
 </html>
